@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CS405</title>
+</head>
+<body>
+<h1 style="justify-content: center; text-align: center;">2017 - 2022 Yılları Arası Kocaeli İntihar Oranları</h1>
+
+<div id="bar-chart"></div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    
+    const data = [
+        { year: 2017, rate: 4.5 },
+        { year: 2018, rate: 4.6 },
+        { year: 2019, rate: 4.5 },
+        { year: 2020, rate: 5.0 },
+        { year: 2021, rate: 6.1 },
+        { year: 2022, rate: 5.2 }
+    ];
+    barChart(data);
+});
+
+function barChart(data) {
+    
+    
+    const width = 1200;
+    const height = 500;
+    const axisHeight = 0;
+    const axisWidth = 150;
+    
+   
+    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    svg.setAttribute("width", width + axisWidth); 
+    svg.setAttribute("height", height + axisHeight ); 
+    svg.setAttribute('viewBox', `-20 -20 ${width + axisWidth + 40} ${height + axisHeight + 40}`);
+
+    
+    const grid = 10;
+    const gridSpace = (height - axisHeight) / grid;
+    for (let i = 0; i <= grid; i++) {
+        let lineY = i * gridSpace;
+        let gridLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        gridLine.setAttribute("x1", axisWidth);
+        gridLine.setAttribute("x2", width);
+        gridLine.setAttribute("y1", lineY);
+        gridLine.setAttribute("y2", lineY);
+        gridLine.setAttribute("stroke", "#ddd"); 
+        svg.appendChild(gridLine); 
+    }
+
+    
+    const maxRatio = 10; 
+    const rateCounter = 1;
+    for (let i = 1; i <= grid; i++) {
+        const lineY = i * gridSpace;
+        const ratioValue = maxRatio - i * rateCounter; 
+
+        const ratioText = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        ratioText.textContent = ratioValue.toFixed(1); 
+        ratioText.setAttribute("x", axisWidth - 10); 
+        ratioText.setAttribute("y", lineY ); 
+        ratioText.setAttribute("text-anchor", "end");
+        ratioText.setAttribute("dominant-baseline", "middle"); 
+        ratioText.setAttribute("fill", "black");
+        ratioText.setAttribute("font-size", "12px");
+        svg.appendChild(ratioText);
+    }
+
+
+    const barLeftMargin = 135; 
+    const barWidth = ((width - axisWidth) / data.length / 2) - 20; 
+    const startPoint = axisWidth + barLeftMargin; 
+
+    data.forEach((entry, i) => {
+        const { year, rate } = entry;
+        const barHeight = (height - axisHeight) * (rate / maxRatio);
+        const barX = i * (barWidth * 2 + 10) + startPoint;
+
+        const bar = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+        bar.setAttribute("width", barWidth); 
+        bar.setAttribute("height", barHeight);
+        bar.setAttribute("x", barX); 
+        bar.setAttribute("y", height - barHeight);
+        bar.setAttribute("fill", "red");
+        svg.appendChild(bar);
+
+        
+        const yearLabel = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        yearLabel.textContent = year;
+        yearLabel.setAttribute("x", barX + barWidth / 2); 
+        yearLabel.setAttribute("y", height + 20);
+        yearLabel.setAttribute("font-size", "14px");
+        yearLabel.setAttribute("text-anchor", "middle"); 
+        yearLabel.setAttribute("fill", "black");
+        svg.appendChild(yearLabel);
+
+        
+        const rateLabel = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        rateLabel.textContent = rate.toFixed(2);
+        rateLabel.setAttribute("x", i * (barWidth * 2 + 10) + barWidth / 2 + startPoint); 
+        rateLabel.setAttribute("y", height - barHeight - 5); 
+        rateLabel.setAttribute("font-size", "14px");
+        rateLabel.setAttribute("text-anchor", "middle");
+        rateLabel.setAttribute("fill", "black");
+        svg.appendChild(rateLabel);
+    });
+
+
+    const xAxis = document.createElementNS("http://www.w3.org/2000/svg", "line");
+    xAxis.setAttribute("x1", axisWidth);
+    xAxis.setAttribute("x2", width);
+    xAxis.setAttribute("y1", height ); 
+    xAxis.setAttribute("y2", height ); 
+    xAxis.setAttribute("stroke", "black");
+    svg.appendChild(xAxis);
+
+    const yAxis = document.createElementNS("http://www.w3.org/2000/svg", "line");
+    yAxis.setAttribute("x1", axisWidth);
+    yAxis.setAttribute("x2", axisWidth);
+    yAxis.setAttribute("y1", 0);
+    yAxis.setAttribute("y2", height);
+    yAxis.setAttribute("stroke", "black");
+    svg.appendChild(yAxis);
+
+
+    const xLabel = document.createElementNS("http://www.w3.org/2000/svg", "text");
+    xLabel.textContent = "Yıl"; 
+    xLabel.setAttribute("x", width + 40); 
+    xLabel.setAttribute("y", height + 5); 
+    xLabel.setAttribute("font-size", "16px");
+    xLabel.setAttribute("text-anchor", "end"); 
+    xLabel.setAttribute("fill", "black");
+    svg.appendChild(xLabel);
+
+
+    const yLabel = document.createElementNS("http://www.w3.org/2000/svg", "text");
+    yLabel.textContent = "İntihar Oranları %"; 
+    yLabel.setAttribute("x", axisWidth); 
+    yLabel.setAttribute("y", -5);
+    yLabel.setAttribute("font-size", "16px");
+    yLabel.setAttribute("text-anchor", "middle");
+    yLabel.setAttribute("fill", "black");
+    svg.appendChild(yLabel);
+
+
+    
+    for (let i = 0; i <= grid; i++) {
+        let lineY = i * gridSpace;
+        let markerY = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        markerY.setAttribute("x1", axisWidth - 6); 
+        markerY.setAttribute("x2", axisWidth); 
+        markerY.setAttribute("y1", lineY);
+        markerY.setAttribute("y2", lineY);
+        markerY.setAttribute("stroke", "black"); 
+        svg.appendChild(markerY);
+    }
+
+    
+    data.forEach((entry, i) => {
+        let barX = i * (barWidth * 2 + 10) + startPoint; 
+        let markerX = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        markerX.setAttribute("x1", barX + barWidth / 2); 
+        markerX.setAttribute("x2", barX + barWidth / 2); 
+        markerX.setAttribute("y1", height);
+        markerX.setAttribute("y2", height + 6); 
+        markerX.setAttribute("stroke", "black");
+        svg.appendChild(markerX);
+
+        
+    });
+
+
+    document.getElementById("bar-chart").appendChild(svg);
+}
+
+
+
+
+
+
+</script>
+</body>
+</html>
